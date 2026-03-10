@@ -16,12 +16,23 @@ def get_paris_musees(url):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(url)
-        name = page.locator(".view-content .title").all_inner_texts()
-        print(name)
+        count = page.locator(".view-content a").count()
+
+        for i in range(count):
+            item = page.locator(".view-content a").nth(i)
+            name = item.get_attribute("title")
+            urlPM = item.get_attribute("href")# Rajouter le reste de l'Url
+            print(name,urlPM)
+            #Next step récupérer les jours, le musée 
+            #Step - Passer les données dans un DataFrame
+
+        
 
         browser.close()
 
 get_paris_musees(urlPM)
+
+
 
 
 
