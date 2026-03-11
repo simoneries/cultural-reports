@@ -20,8 +20,15 @@ def get_paris_musees(url):
 
         for i in range(count):
             item = page.locator(".view-content a").nth(i)
-            name = item.get_attribute("title")
-            urlPM = item.get_attribute("href")# Rajouter le reste de l'Url
+            try: 
+                name = item.get_attribute("title")
+            except: 
+                name = "Nom inconnu"
+            
+            try:
+                url_expo = item.get_attribute("href")# Rajouter le reste de l'Url
+            except:
+                url_expo = "url inconnue" 
 
             try: 
                 musee = item.locator(".nom-musee").first.inner_text()
