@@ -2,6 +2,8 @@
 Application visant à récupérer les principales expos en cours à Paris toutes les semaines
 
 """
+import pandas as pd
+import numpy as np
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from datetime import datetime
 
