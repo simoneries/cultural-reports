@@ -2,7 +2,7 @@
 Application visant à récupérer les principales expos en cours à Paris toutes les semaines
 
 """
-from playwright.sync_api import sync_playwright
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
 
 #1 - Récuperer les principales expos à Paris dans une liste à print
@@ -22,7 +22,15 @@ def get_paris_musees(url):
             item = page.locator(".view-content a").nth(i)
             name = item.get_attribute("title")
             urlPM = item.get_attribute("href")# Rajouter le reste de l'Url
-            print(name,urlPM)
+
+            try: 
+                musee = item.locator(".nom-musee").first.inner_text()
+            except PlaywrightTimeoutError:
+                musee = "Musee inconnu"
+            
+
+            print(name,urlPM,musee)
+            
             #Next step récupérer les jours, le musée 
             #Step - Passer les données dans un DataFrame
 
