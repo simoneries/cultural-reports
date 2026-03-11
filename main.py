@@ -12,6 +12,12 @@ from datetime import datetime
 expos_louvre = []
 urlPM = "https://www.parismusees.paris.fr/fr/expositions"
 
+names = []
+musees=[]
+urls_expo = []
+dates_debut = []
+dates_fin = []
+
 #1 - A - Récupérer les données du Louvre
 
 def get_paris_musees(url):
@@ -25,18 +31,24 @@ def get_paris_musees(url):
             item = page.locator(".view-content a").nth(i)
             try: 
                 name = item.get_attribute("title")
+                names.append(name)
             except: 
                 name = None
+                names.append(name)
             
             try:
                 url_expo = item.get_attribute("href")# Rajouter le reste de l'Url
+                urls_expo.append(url_expo)
             except:
                 url_expo = None
+                urls_expo.append(url_expo)
 
             try: 
                 musee = item.locator(".nom-musee").first.inner_text()
+                musees.append(musee)
             except PlaywrightTimeoutError:
                 musee = None
+                musees.append(musee)
 
             try:
                 date_debut_loc = item.locator(".date-debut-evenement").all_inner_texts()
@@ -48,24 +60,35 @@ def get_paris_musees(url):
                 date_format = '%d-%m-%y'
                 date_fin = datetime.strptime(date_fin_str,date_format)
 
+                dates_debut.append(date_debut)
+                dates_fin.append(date_fin)
+
             except PlaywrightTimeoutError:
                 date_debut = None
                 date_fin = None
-
-            print(name, url_expo, musee, date_debut,date_fin)
+                dates_debut.append(date_debut)
+                dates_fin.append(date_fin)
             
             #Next step récupérer les jours, le musée 
             #Step - Passer les données dans un DataFrame
-
-        
-
         browser.close()
 
 get_paris_musees(urlPM)
+#print(names, urls_expo, musees, dates_debut,dates_fin)
 
-
-
+def set_as_dictionnary():
+    dict_expos={}
+    for i in range(len(names)):
+        id = i
+        #creer le sous-dictionnaire 
+        sous_dict = dict(name = names[i],musee= musees[i],url=urls_expo[i],date_debut=dates_debut[i],dates_fin=dates_fin[i])
+        dict_expos[id]=sous_dict
+    return dict_expos
 
 
 #1 - B - Récupérer les données de plusieurs musées
+
+final_dict = set_as_dictionnary()
+
+print(final_dict)
 # 2 - Set up les données dans un DataFrame
