@@ -84,10 +84,14 @@ def get_louvre(url):
         count = page.locator("#exposition-d-actualite a").count()
         
         for i in range(count):
-            item = page.locator("#exposition-d-actualite a").nth(i)
-            data_tracking_str = item.get_attribute("data-tracking")  
-            data_dict = json.loads(data_tracking_str)
-            print(data_dict["label"])
+            try:
+                item = page.locator("#exposition-d-actualite a").nth(i)
+                data_tracking_str = item.get_attribute("data-tracking")  
+                data_dict = json.loads(data_tracking_str)
+                names.append(data_dict["label"])
+            except PlaywrightTimeoutError:
+                name = None
+                names.append(name)
 
 get_louvre(urlL)
 
