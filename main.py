@@ -6,13 +6,14 @@ import pandas as pd
 import numpy as np
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from datetime import datetime
+import json
 
 
 #1 - Récuperer les principales expos à Paris dans une liste à print
 expos_louvre = []
 urlPM = "https://www.parismusees.paris.fr/fr/expositions"
+urlL = "https://www.louvre.fr/expositions-et-evenements/expositions"
 
-#columns_df = ["names","musees","urls","debut","fin"]
 names = []
 musees=[]
 urls_expo = []
@@ -74,12 +75,32 @@ def get_paris_musees(url):
             #Step - Passer les données dans un DataFrame
         browser.close()
 
-get_paris_musees(urlPM)
-#print(names, urls_expo, musees, dates_debut,dates_fin)
+
+def get_louvre(url):
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page()
+        page.goto(url,timeout=0)
+        count = page.locator("#exposition-d-actualite a").count()
+        
+        for i in range(count):
+            item = page.locator("#exposition-d-actualite a").nth(i)
+            data_tracking_str = item.get_attribute("data-tracking")  
+            data_dict = json.loads(data_tracking_str)
+            print(data_dict["label"])
+
+get_louvre(urlL)
+
+
+
+
+#get_paris_musees(urlPM)
+
 
 df = pd.DataFrame({"musee":musees,"nom":names,"debut":dates_debut,"fin":dates_fin,"url":urls_expo})
 
-print(df)
+
+
 
 
 
