@@ -34,14 +34,14 @@ def get_paris_musees(url):
             try: 
                 name = item.get_attribute("title")
                 names.append(name)
-            except: 
+            except PlaywrightTimeoutError: 
                 name = None
                 names.append(name)
             
             try:
                 url_expo = item.get_attribute("href")# Rajouter le reste de l'Url
                 urls_expo.append(url_expo)
-            except:
+            except PlaywrightTimeoutError:
                 url_expo = None
                 urls_expo.append(url_expo)
 
