@@ -12,6 +12,7 @@ from datetime import datetime
 expos_louvre = []
 urlPM = "https://www.parismusees.paris.fr/fr/expositions"
 
+#columns_df = ["names","musees","urls","debut","fin"]
 names = []
 musees=[]
 urls_expo = []
@@ -76,19 +77,10 @@ def get_paris_musees(url):
 get_paris_musees(urlPM)
 #print(names, urls_expo, musees, dates_debut,dates_fin)
 
-def set_as_dictionnary():
-    dict_expos={}
-    for i in range(len(names)):
-        id = i
-        #creer le sous-dictionnaire 
-        sous_dict = dict(name = names[i],musee= musees[i],url=urls_expo[i],date_debut=dates_debut[i],dates_fin=dates_fin[i])
-        dict_expos[id]=sous_dict
-    return dict_expos
+df = pd.DataFrame({"musee":musees,"nom":names,"debut":dates_debut,"fin":dates_fin,"url":urls_expo})
+
+print(df)
 
 
-#1 - B - Récupérer les données de plusieurs musées
 
-final_dict = set_as_dictionnary()
-
-print(final_dict)
 # 2 - Set up les données dans un DataFrame
