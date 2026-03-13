@@ -7,12 +7,15 @@ import numpy as np
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 from datetime import datetime
 import json
+import locale
 
 
 #1 - Récuperer les principales expos à Paris dans une liste à print
 expos_louvre = []
 urlPM = "https://www.parismusees.paris.fr/fr/expositions"
 urlL = "https://www.louvre.fr/expositions-et-evenements/expositions"
+
+locale.setlocale(locale.LC_ALL,"fr_FR.UTF-8")
 
 names = []
 musees=[]
@@ -81,27 +84,68 @@ def get_louvre(url):
         browser = p.chromium.launch()
         page = browser.new_page()
         page.goto(url,timeout=0)
-        count = page.locator("#exposition-d-actualite a").count()
+        count = page.locator("#exposition-d-actualite .Card_child").count()
         
-        for i in range(count):
+        for i in range(count):    
+            item = page.locator("#exposition-d-actualite .Card_child").nth(i)
             try:
-                item = page.locator("#exposition-d-actualite a").nth(i)
-                data_tracking_str = item.get_attribute("data-tracking")  
+                data_tracking_str = item.locator("a").get_attribute("data-tracking")  
                 data_dict = json.loads(data_tracking_str)
                 names.append(data_dict["label"])
             except PlaywrightTimeoutError:
                 name = None
                 names.append(name)
+            try:
+                url_expo = item.locator("a").get_attribute("href")# Rajouter le reste de l'Url
+                urls_expo.append(url_expo)
+                #print(url_expo)
+            except PlaywrightTimeoutError:
+                url_expo = None
+                urls_expo.append(url_expo)
+            
+            date_debut_fin_str = item.locator(".Card_Secondary_date").first.inner_text()
+            date_debut_fin_lst = date_debut_fin_str.split("–")
+            date_debut,date_fin = date_debut_fin_lst[0].strip(),date_debut_fin_lst[1].strip()
 
+            try: 
+                date_fin = datetime.strptime(date_fin,"%d %B %Y")
+                dates_fin.append(date_fin)
+            except PlaywrightTimeoutError:
+                date_fin = None
+                dates_fin.append(date_fin)
+            
+          
+            try: 
+                date_debut = datetime.strptime(date_debut,"%d %B %Y")
+                dates_debut.append(date_debut)
+            except ValueError:
+                date_debut = datetime.strptime(date_debut,"%d %B")
+                date_debut = date_debut.replace(year=date_fin.year)
+                dates_debut.append(date_debut)
+            except PlaywrightTimeoutError:
+                date_debut = None
+                dates_debut.append(date_debut)
+
+            
+
+            print(date_debut,date_fin)
+            
+
+
+            musee = "Louvre"
+            musees.append(musee)
+
+
+
+            
+
+get_paris_musees(urlPM)
 get_louvre(urlL)
 
 
-
-
-#get_paris_musees(urlPM)
-
-
 df = pd.DataFrame({"musee":musees,"nom":names,"debut":dates_debut,"fin":dates_fin,"url":urls_expo})
+
+print(df)
 
 
 
